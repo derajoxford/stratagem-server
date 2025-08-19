@@ -68,4 +68,73 @@ Deno.serve(async (req) => {
         const userPermissions = proposingAlliance.custom_roles?.[userRoleKey]?.permissions || {};
 
         if (!isFounder && !userPermissions.disband_alliance) {
-   
+                return new Response(JSON.stringify({ error: 'You do not have permission to propose a merge.' }), { 
+                 status: 403, 
+                 headers: { "Content-Type": "application/json" } 
+             });
+        }
+
+        // Validate target alliance
+        if (!targetAllianceId) {
+            return new Response(JSON.stringify({ error: 'Target alliance ID is required.' }), { 
+                status: 400, 
+                headers: { "Content-Type": "application/json" } 
+            });
+        }
+
+        if (proposingAlliance.id === targetAllianceId) {
+            return new Response(JSON.stringify({ error: 'Cannot propose a merge with your own alliance.' }), { 
+                status: 400, 
+                headers: { "Content-Type": "application/json" } 
+            });
+        }
+
+        const targetAlliance = await base44.entities.Alliance.get(targetAllianceId);
+        if (!targetAlliance || !targetAlliance.active) {
+            return new Response(JSON.stringify({ error: 'Target alliance not found or is not active.' }), { 
+                status: 404, 
+                headers: { "Content-Type": "application/json" } 
+            });
+        }
+
+        // Check for existing proposals
+        const existingProposals = await base44.entities.MergeProposal.filter({
+            proposing_alliance_id: proposingAlliance.id,
+            receiving_alliance_id: targetAllianceId,
+            status: 'pending'
+        });
+
+        if (existingProposals.length > 0) {
+            return new Response(JSON.stringify({ error: 'A pending merge proposal already exists between these alliances.' }), { 
+                status: 409, 
+                headers: { "Content-Type": "application/json" } 
+            });
+        }
+
+        // Create proposal
+        const proposalData = {
+            proposing_alliance_id: proposingAlliance.id,
+            receiving_alliance_id: targetAllianceId,
+            surviving_alliance_id: proposingAlliance.id,
+            merging_alliance_id: targetAllianceId,
+            status: 'pending',
+            proposed_by_nation_id: nation.id,
+            message: message || 'A proposal for alliance merger.',
+            expires_at: addDays(new Date(), 7).toISOString(),
+        };
+
+        const newProposal = await base44.entities.MergeProposal.create(proposalData);
+
+        return new Response(JSON.stringify({ success: true, proposal: newProposal }), { 
+            status: 201, 
+            headers: { "Content-Type": "application/json" } 
+        });
+
+    } catch (error) {
+        console.error("Error in proposeMerge function:", error);
+        return new Response(JSON.stringify({ error: error.message }), { 
+            status: 500, 
+            headers: { "Content-Type": "application/json" } 
+        });
+    }
+});
