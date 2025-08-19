@@ -89,3 +89,62 @@ Deno.serve(async (req) => {
 
         console.log(`Recipient nation ID: ${recipientNationId}`);
 
+        // Check if there's already a pending proposal for this war
+        console.log('Checking for existing pending proposals');
+        const existingProposals = await base44.entities.CeasefireProposal.filter({ 
+            war_id: warId, 
+            status: 'pending' 
+        });
+
+        if (existingProposals.length > 0) {
+            console.log(`Found ${existingProposals.length} existing pending proposals`);
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: "A ceasefire proposal is already pending for this war" 
+            }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        // Create ceasefire proposal
+        console.log('Creating ceasefire proposal');
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24); // Expires in 24 hours
+
+        const proposalData = {
+            war_id: warId,
+            proposer_nation_id: proposerNation.id,
+            recipient_nation_id: recipientNationId,
+            message: message || "",
+            expires_at: expiresAt.toISOString(),
+            status: 'pending'
+        };
+
+        console.log('Proposal data:', proposalData);
+        const proposal = await base44.entities.CeasefireProposal.create(proposalData);
+        console.log('Ceasefire proposal created:', proposal);
+
+        console.log('=== PROPOSE CEASEFIRE COMPLETED ===');
+        return new Response(JSON.stringify({
+            success: true,
+            message: "Ceasefire proposal sent",
+            proposal: proposal
+        }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" }
+        });
+
+    } catch (error) {
+        console.error("Error proposing ceasefire:", error);
+        console.error("Error stack:", error.stack);
+        
+        return new Response(JSON.stringify({
+            success: false,
+            error: `Server error: ${error.message}`
+        }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" }
+        });
+    }
+});
