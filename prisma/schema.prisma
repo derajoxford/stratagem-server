@@ -1,2 +1,56 @@
 datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
 generator client { provider = "prisma-client-js" }
+model GameState {
+  id                     String   @id @default(cuid())
+  current_turn_number    Int      @default(1)
+  is_processing          Boolean  @default(false)
+  last_turn_processed_at DateTime?
+  createdAt              DateTime @default(now())
+}
+
+model GameConfig {
+  id               String   @id @default(cuid())
+  config_data_json Json     // stores full JSON; must include war_settings { max_tactical_points, tactical_points_per_turn }
+  createdAt        DateTime @default(now())
+}
+
+model Alliance {
+  id        String   @id @default(cuid())
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Nation {
+  id        String   @id @default(cuid())
+  name      String
+  treasury  Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+enum WarStatus {
+  active
+  ended
+}
+
+model War {
+  id                        String    @id @default(cuid())
+  status                    WarStatus @default(active)
+  attacker_tactical_points  Int       @default(0)
+  defender_tactical_points  Int       @default(0)
+  createdAt                 DateTime  @default(now())
+}
+
+model FinancialTransaction {
+  id            String   @id @default(cuid())
+  nationId      String
+  nation        Nation   @relation(fields: [nationId], references: [id])
+  transaction_type String
+  category         String
+  sub_category     String
+  amount           Int
+  new_balance      Int
+  turn_number      Int
+  createdAt        DateTime @default(now())
+}
