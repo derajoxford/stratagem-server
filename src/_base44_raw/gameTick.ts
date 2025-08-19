@@ -1,201 +1,190 @@
-// src/_base44_raw/gameTick.ts
-//
-// Node + Prisma rewrite of Base44 gameTick.
-// - Keeps same flow: lock GameState → batch nations → update treasury → update wars' tactical points → advance turn → unlock.
-// - Reads war_settings from GameConfig.config_data_json (same shape your code expects).
-// - No Deno or Base44 SDK.
+import { createClientFromRequest } from 'npm:@base44/sdk@0.5.0';
 
-import { prisma } from '../lib/db';
+// Helper function to delay execution with randomization
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-/** -------- helpers -------- */
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+// Helper function with retry logic and added jitter for rate limiting
+const retryWithBackoff = async (fn, maxRetries = 4, baseDelay = 500) => {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            if (error.message.includes('rate limit') || error.message.includes('Rate limit') || error.status === 429) {
+                if (attempt === maxRetries) {
+                    throw new Error(`Rate limit exceeded after ${maxRetries} attempts`);
+                }
+                const jitter = Math.random() * 500; // Add 0-500ms of random jitter
+                const delayTime = baseDelay * Math.pow(2, attempt - 1) + jitter;
+                console.log(`Rate limit hit, retrying in ${delayTime.toFixed(0)}ms (attempt ${attempt}/${maxRetries})`);
+                await delay(delayTime);
+            } else {
+                throw error;
+            }
+        }
+    }
+};
 
-// Generic retry with backoff (useful for transient DB hiccups)
-async function retryWithBackoff<T>(fn: () => Promise<T>, maxRetries = 3, baseDelay = 250): Promise<T> {
-  let err: any;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+const BATCH_SIZE = 10; // Process 10 nations at a time
+
+Deno.serve(async (req) => {
+    const base44 = createClientFromRequest(req);
+    const serviceClient = base44.asServiceRole;
+
     try {
-      return await fn();
-    } catch (e: any) {
-      err = e;
-      const jitter = Math.random() * 150;
-      const wait = baseDelay * Math.pow(2, attempt - 1) + jitter;
-      if (attempt === maxRetries) break;
-      console.warn(`[retry] ${e?.message || e}; waiting ${wait.toFixed(0)}ms (attempt ${attempt}/${maxRetries})`);
-      await delay(wait);
-    }
-  }
-  throw err;
-}
+        console.log("Game tick process started.");
 
-const BATCH_SIZE = 10;
+        // Lock the game state to prevent concurrent processing
+        const gameStates = await retryWithBackoff(() => serviceClient.entities.GameState.list());
+        let gameState = gameStates[0];
 
-/** -------- main entry called by /api/admin/tick -------- */
-export async function runGameTick() {
-  console.log('[tick] Game tick process started.');
-
-  // 1) Lock GameState (create if missing)
-  let gameState = await retryWithBackoff(() =>
-    prisma.gameState.findFirst()
-  );
-
-  if (gameState?.is_processing) {
-    return {
-      success: false,
-      error: 'Turn is already being processed.',
-      status: 409
-    };
-  }
-
-  if (!gameState) {
-    gameState = await retryWithBackoff(() =>
-      prisma.gameState.create({
-        data: { current_turn_number: 1, is_processing: true }
-      })
-    );
-  } else {
-    await retryWithBackoff(() =>
-      prisma.gameState.update({
-        where: { id: gameState!.id },
-        data: { is_processing: true }
-      })
-    );
-  }
-
-  try {
-    // 2) Load config & data
-    const [configRow, nations, alliances, wars] = await Promise.all([
-      retryWithBackoff(() => prisma.gameConfig.findFirst({ orderBy: { createdAt: 'desc' } })),
-      retryWithBackoff(() => prisma.nation.findMany({ where: { active: true } })),
-      // alliances are optional in this pass; we fetch to mirror original shape
-      retryWithBackoff(() => prisma.alliance.findMany({ where: { active: true } }).catch(() => Promise.resolve([]))),
-      retryWithBackoff(() => prisma.war.findMany({ where: { status: 'active' } })),
-    ]);
-
-    if (!configRow) throw new Error('GameConfig not found.');
-    let gameConfig: any;
-    try {
-      gameConfig = typeof configRow.config_data_json === 'string'
-        ? JSON.parse(configRow.config_data_json as any)
-        : configRow.config_data_json;
-    } catch {
-      throw new Error('GameConfig.config_data_json is not valid JSON');
-    }
-    const warSettings = gameConfig?.war_settings;
-    if (!warSettings) throw new Error('GameConfig.war_settings is missing');
-
-    // 3) Batch nations: update treasury, optionally write transactions
-    const nationBatches: typeof nations[] = [];
-    for (let i = 0; i < nations.length; i += BATCH_SIZE) {
-      nationBatches.push(nations.slice(i, i + BATCH_SIZE));
-    }
-
-    console.log(`[tick] Processing ${nations.length} nations in ${nationBatches.length} batches.`);
-    let nationsProcessed = 0;
-
-    for (let batchIdx = 0; batchIdx < nationBatches.length; batchIdx++) {
-      const batch = nationBatches[batchIdx];
-
-      // Build all writes for this batch
-      const writes: Promise<any>[] = [];
-      for (const n of batch) {
-        // In your original code, turnIncome was 0 (placeholder). Keep it for now.
-        const turnIncome = 0;
-
-        if (turnIncome > 0) {
-          writes.push(
-            prisma.financialTransaction.create({
-              data: {
-                nationId: n.id,
-                transaction_type: 'inflow',
-                category: 'Taxes',
-                sub_category: 'National Income',
-                amount: turnIncome,
-                new_balance: (n.treasury ?? 0) + turnIncome,
-                turn_number: gameState.current_turn_number,
-              }
-            })
-          );
+        if (gameState && gameState.is_processing) {
+            return new Response(JSON.stringify({ success: false, error: 'Turn is already being processed.' }), { status: 409 });
         }
 
-        writes.push(
-          prisma.nation.update({
-            where: { id: n.id },
-            data: { treasury: (n.treasury ?? 0) + turnIncome }
-          })
-        );
-
-        nationsProcessed++;
-      }
-
-      if (writes.length) {
-        await retryWithBackoff(() => prisma.$transaction(writes));
-      }
-
-      console.log(`[tick] Batch ${batchIdx + 1} complete.`);
-      if (batchIdx < nationBatches.length - 1) {
-        const betweenBatchDelay = 400 + Math.random() * 350;
-        console.log(`[tick] Sleeping ${betweenBatchDelay.toFixed(0)}ms before next batch.`);
-        await delay(betweenBatchDelay);
-      }
-    }
-
-    // 4) Wars: add tactical points per war_settings
-    if (wars.length) {
-      const updates = wars.map((w) =>
-        prisma.war.update({
-          where: { id: w.id },
-          data: {
-            attacker_tactical_points: Math.min(
-              warSettings.max_tactical_points,
-              (w.attacker_tactical_points ?? 0) + warSettings.tactical_points_per_turn
-            ),
-            defender_tactical_points: Math.min(
-              warSettings.max_tactical_points,
-              (w.defender_tactical_points ?? 0) + warSettings.tactical_points_per_turn
-            )
-          }
-        })
-      );
-      await retryWithBackoff(() => prisma.$transaction(updates));
-    }
-    console.log(`[tick] Processed ${wars.length} active wars.`);
-
-    // 5) Advance turn & unlock
-    const nextTurn = (gameState.current_turn_number ?? 1) + 1;
-    await retryWithBackoff(() =>
-      prisma.gameState.update({
-        where: { id: gameState!.id },
-        data: {
-          current_turn_number: nextTurn,
-          is_processing: false,
-          last_turn_processed_at: new Date()
+        if (gameState) {
+            await retryWithBackoff(() => serviceClient.entities.GameState.update(gameState.id, { is_processing: true }));
+        } else {
+            gameState = await retryWithBackoff(() => serviceClient.entities.GameState.create({ current_turn_number: 1, is_processing: true }));
         }
-      })
-    );
 
-    console.log(`[tick] Game tick complete. New turn is #${nextTurn}.`);
+        // Load necessary game data
+        const [gameConfigs, allNations, allAlliances, activeWars] = await Promise.all([
+            retryWithBackoff(() => serviceClient.entities.GameConfig.list()),
+            retryWithBackoff(() => serviceClient.entities.Nation.filter({ active: true })),
+            retryWithBackoff(() => serviceClient.entities.Alliance.filter({ active: true })),
+            retryWithBackoff(() => serviceClient.entities.War.filter({ status: 'active' }))
+        ]);
 
-    return {
-      success: true,
-      message: `Turn ${gameState.current_turn_number} processed. New turn is #${nextTurn}.`,
-      nationsProcessed,
-      warsProcessed: wars.length
-    };
-  } catch (error: any) {
-    console.error('[tick] Game tick failed:', error);
+        if (gameConfigs.length === 0) throw new Error("GameConfig not found.");
+        const gameConfig = JSON.parse(gameConfigs[0].config_data_json);
+        const warSettings = gameConfig.war_settings; // CRITICAL FIX: Define warSettings
 
-    // Best-effort unlock
-    try {
-      const gs = await prisma.gameState.findFirst();
-      if (gs?.is_processing) {
-        await prisma.gameState.update({ where: { id: gs.id }, data: { is_processing: false } });
-        console.log('[tick] Unlocked game state after failure.');
-      }
-    } catch (unlockErr) {
-      console.error('[tick] CRITICAL: Failed to unlock game state after an error.', unlockErr);
+        const nationResources = await retryWithBackoff(() => serviceClient.entities.Resource.list());
+        const resourceMap = new Map(nationResources.map(r => [r.nation_id, r]));
+
+        const nationMilitaries = await retryWithBackoff(() => serviceClient.entities.Military.list());
+        const militaryMap = new Map(nationMilitaries.map(m => [m.nation_id, m]));
+
+        // Process nations in batches
+        const nationBatches = [];
+        for (let i = 0; i < allNations.length; i += BATCH_SIZE) {
+            nationBatches.push(allNations.slice(i, i + BATCH_SIZE));
+        }
+        
+        console.log(`Processing ${allNations.length} nations in ${nationBatches.length} batches.`);
+        let nationsProcessed = 0;
+
+        for (const [batchIndex, nationBatch] of nationBatches.entries()) {
+            console.log(`Processing nation batch ${batchIndex + 1}/${nationBatches.length}...`);
+            const nationUpdatePromises = [];
+            const resourceUpdatePromises = [];
+            const transactionPromises = [];
+
+            for (const nation of nationBatch) {
+                const resources = resourceMap.get(nation.id);
+                if (!resources) continue;
+
+                let turnIncome = 0;
+                // Add income logic here in the future if needed
+
+                // Create transaction record
+                if (turnIncome > 0) {
+                     transactionPromises.push(
+                        serviceClient.entities.FinancialTransaction.create({
+                            nation_id: nation.id,
+                            transaction_type: 'inflow',
+                            category: 'Taxes',
+                            sub_category: 'National Income',
+                            amount: turnIncome,
+                            new_balance: (nation.treasury || 0) + turnIncome,
+                            turn_number: gameState.current_turn_number,
+                        })
+                    );
+                }
+
+                nationUpdatePromises.push(
+                    serviceClient.entities.Nation.update(nation.id, {
+                        treasury: (nation.treasury || 0) + turnIncome
+                    })
+                );
+                
+                nationsProcessed++;
+            }
+
+            // Execute batch updates with randomized delay
+            if (nationUpdatePromises.length > 0) {
+                await retryWithBackoff(() => Promise.all(nationUpdatePromises));
+                await delay(150 + Math.random() * 200); // Jitter: 150-350ms
+            }
+            if (resourceUpdatePromises.length > 0) {
+                await retryWithBackoff(() => Promise.all(resourceUpdatePromises));
+                await delay(150 + Math.random() * 200); // Jitter: 150-350ms
+            }
+            if(transactionPromises.length > 0) {
+                await retryWithBackoff(() => Promise.all(transactionPromises));
+                await delay(150 + Math.random() * 200); // Jitter: 150-350ms
+            }
+
+            console.log(`Batch ${batchIndex + 1} complete.`);
+            if (batchIndex < nationBatches.length - 1) {
+                const betweenBatchDelay = 400 + Math.random() * 350; // Jitter: 400-750ms delay
+                console.log(`Delaying for ${betweenBatchDelay.toFixed(0)}ms before next batch.`);
+                await delay(betweenBatchDelay);
+            }
+        }
+        
+        // Process wars: add tactical points
+        const warUpdatePromises = [];
+        for (const war of activeWars) {
+            warUpdatePromises.push(
+                serviceClient.entities.War.update(war.id, {
+                    attacker_tactical_points: Math.min(
+                        warSettings.max_tactical_points,
+                        (war.attacker_tactical_points || 0) + warSettings.tactical_points_per_turn
+                    ),
+                    defender_tactical_points: Math.min(
+                        warSettings.max_tactical_points,
+                        (war.defender_tactical_points || 0) + warSettings.tactical_points_per_turn
+                    )
+                })
+            );
+        }
+        if (warUpdatePromises.length > 0) {
+            await retryWithBackoff(() => Promise.all(warUpdatePromises));
+        }
+        console.log(`Processed ${activeWars.length} active wars.`);
+
+        // Finalize turn processing
+        const nextTurnNumber = gameState.current_turn_number + 1;
+        await retryWithBackoff(() => serviceClient.entities.GameState.update(gameState.id, {
+            current_turn_number: nextTurnNumber,
+            is_processing: false,
+            last_turn_processed_at: new Date().toISOString()
+        }));
+
+        console.log(`Game tick complete. New turn is #${nextTurnNumber}.`);
+
+        return new Response(JSON.stringify({
+            success: true,
+            message: `Turn ${gameState.current_turn_number} processed. New turn is #${nextTurnNumber}.`,
+            nationsProcessed: nationsProcessed,
+            warsProcessed: activeWars.length
+        }), { status: 200 });
+
+    } catch (error) {
+        console.error("Game tick failed:", error);
+        
+        // Attempt to unlock the game state on failure
+        try {
+            const gameStates = await serviceClient.entities.GameState.list();
+            if (gameStates.length > 0 && gameStates[0].is_processing) {
+                await serviceClient.entities.GameState.update(gameStates[0].id, { is_processing: false });
+                console.log("Successfully unlocked game state after failure.");
+            }
+        } catch (unlockError) {
+            console.error("CRITICAL: Failed to unlock game state after an error.", unlockError);
+        }
+
+        return new Response(JSON.stringify({ success: false, error: error.message }), { status: 500 });
     }
-
-    return { success: false, error: error?.message || String(error) };
-  }
-}
+});
