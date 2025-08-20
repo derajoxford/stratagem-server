@@ -1,0 +1,62 @@
+{
+  "name": "MergeProposal",
+  "type": "object",
+  "properties": {
+    "proposing_alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance initiating the merge proposal"
+    },
+    "receiving_alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance that needs to approve the merge"
+    },
+    "surviving_alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance that will remain active after the merge"
+    },
+    "merging_alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance that will be absorbed/disbanded"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "rejected",
+        "expired"
+      ],
+      "default": "pending",
+      "description": "Current status of the merge proposal"
+    },
+    "proposed_by_nation_id": {
+      "type": "string",
+      "description": "ID of the nation that initiated this proposal"
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional message from the proposing alliance"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this proposal expires if not responded to (7 days from creation)"
+    },
+    "responded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the proposal was responded to"
+    },
+    "responded_by_nation_id": {
+      "type": "string",
+      "description": "ID of the nation that responded to this proposal"
+    }
+  },
+  "required": [
+    "proposing_alliance_id",
+    "receiving_alliance_id",
+    "surviving_alliance_id",
+    "merging_alliance_id",
+    "proposed_by_nation_id"
+  ]
+}
