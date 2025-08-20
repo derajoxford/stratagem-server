@@ -1,0 +1,210 @@
+{
+  "name": "Alliance",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the alliance"
+    },
+    "description": {
+      "type": "string",
+      "description": "Alliance description"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "URL to the alliance's flag/logo image"
+    },
+    "founder_nation_id": {
+      "type": "string",
+      "description": "Nation ID of the alliance founder"
+    },
+    "member_nations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Array of nation IDs in this alliance"
+    },
+    "total_military_strength": {
+      "type": "number",
+      "default": 0,
+      "description": "Combined military strength of all members"
+    },
+    "total_cities": {
+      "type": "number",
+      "default": 0,
+      "description": "Combined number of cities owned by all alliance members"
+    },
+    "treasury": {
+      "type": "number",
+      "default": 0,
+      "description": "Alliance shared treasury"
+    },
+    "tax_rate": {
+      "type": "number",
+      "default": 0,
+      "minimum": 0,
+      "maximum": 25,
+      "description": "Tax rate imposed on members' income (0-25%)"
+    },
+    "member_roles": {
+      "type": "object",
+      "default": {},
+      "description": "Object mapping nation IDs to their custom role IDs"
+    },
+    "custom_roles": {
+      "type": "object",
+      "default": {
+        "founder": {
+          "title": "Founder",
+          "permissions": {
+            "manage_alliance": true,
+            "manage_members": true,
+            "manage_roles": true,
+            "manage_bank": true,
+            "withdraw_funds": true,
+            "send_invitations": true,
+            "review_applications": true,
+            "manage_treaties": true,
+            "disband_alliance": true
+          },
+          "rank": 1,
+          "is_system_role": true
+        },
+        "leader": {
+          "title": "Leader",
+          "permissions": {
+            "manage_alliance": true,
+            "manage_members": true,
+            "manage_roles": false,
+            "manage_bank": true,
+            "withdraw_funds": true,
+            "send_invitations": true,
+            "review_applications": true,
+            "manage_treaties": true,
+            "disband_alliance": false
+          },
+          "rank": 2,
+          "is_system_role": true
+        },
+        "officer": {
+          "title": "Officer",
+          "permissions": {
+            "manage_alliance": false,
+            "manage_members": false,
+            "manage_roles": false,
+            "manage_bank": false,
+            "withdraw_funds": false,
+            "send_invitations": true,
+            "review_applications": true,
+            "manage_treaties": false,
+            "disband_alliance": false
+          },
+          "rank": 3,
+          "is_system_role": true
+        },
+        "member": {
+          "title": "Member",
+          "permissions": {
+            "manage_alliance": false,
+            "manage_members": false,
+            "manage_roles": false,
+            "manage_bank": false,
+            "withdraw_funds": false,
+            "send_invitations": false,
+            "review_applications": false,
+            "manage_treaties": false,
+            "disband_alliance": false
+          },
+          "rank": 99,
+          "is_system_role": true
+        }
+      },
+      "description": "Custom roles with titles and permissions"
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "oil": {
+          "type": "number",
+          "default": 0
+        },
+        "gasoline": {
+          "type": "number",
+          "default": 0
+        },
+        "iron": {
+          "type": "number",
+          "default": 0
+        },
+        "steel": {
+          "type": "number",
+          "default": 0
+        },
+        "aluminum": {
+          "type": "number",
+          "default": 0
+        },
+        "coal": {
+          "type": "number",
+          "default": 0
+        },
+        "uranium": {
+          "type": "number",
+          "default": 0
+        },
+        "food": {
+          "type": "number",
+          "default": 0
+        },
+        "gold": {
+          "type": "number",
+          "default": 0
+        },
+        "bauxite": {
+          "type": "number",
+          "default": 0
+        },
+        "copper": {
+          "type": "number",
+          "default": 0
+        },
+        "diamonds": {
+          "type": "number",
+          "default": 0
+        },
+        "wood": {
+          "type": "number",
+          "default": 0
+        },
+        "ammo": {
+          "type": "number",
+          "default": 0
+        }
+      },
+      "default": {}
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether alliance is active"
+    },
+    "public_description": {
+      "type": "string",
+      "description": "Rich text public-facing description for the alliance's profile page."
+    },
+    "profile_image_url": {
+      "type": "string",
+      "description": "URL to the alliance's custom profile image."
+    },
+    "banner_image_url": {
+      "type": "string",
+      "description": "URL to the alliance's custom banner image."
+    }
+  },
+  "required": [
+    "name",
+    "founder_nation_id"
+  ]
+}
