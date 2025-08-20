@@ -1,0 +1,49 @@
+{
+  "name": "CeasefireProposal",
+  "type": "object",
+  "properties": {
+    "war_id": {
+      "type": "string",
+      "description": "ID of the war this ceasefire proposal relates to"
+    },
+    "proposer_nation_id": {
+      "type": "string",
+      "description": "ID of the nation proposing the ceasefire"
+    },
+    "recipient_nation_id": {
+      "type": "string",
+      "description": "ID of the nation receiving the ceasefire proposal"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "rejected",
+        "withdrawn",
+        "expired"
+      ],
+      "default": "pending",
+      "description": "Current status of the ceasefire proposal"
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional message from the proposing nation"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this proposal expires if not responded to"
+    },
+    "responded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the proposal was responded to"
+    }
+  },
+  "required": [
+    "war_id",
+    "proposer_nation_id",
+    "recipient_nation_id"
+  ]
+}
