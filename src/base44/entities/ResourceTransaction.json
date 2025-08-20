@@ -1,0 +1,55 @@
+{
+  "name": "ResourceTransaction",
+  "type": "object",
+  "properties": {
+    "nation_id": {
+      "type": "string",
+      "description": "ID of the nation associated with this transaction."
+    },
+    "resource_type": {
+      "type": "string",
+      "description": "The type of resource (e.g., 'oil', 'steel', 'food')."
+    },
+    "transaction_type": {
+      "type": "string",
+      "enum": [
+        "inflow",
+        "outflow"
+      ],
+      "description": "Indicates if it's resources gained or consumed."
+    },
+    "category": {
+      "type": "string",
+      "description": "High-level categorization (e.g., 'Production', 'Market Trade', 'Upkeep', 'Building', 'Warfare', 'Alliance')."
+    },
+    "sub_category": {
+      "type": "string",
+      "description": "More specific detail (e.g., 'City Production: Oil Wells', 'Market Purchase: Steel', 'Unit Upkeep: Tanks', 'Build: Factories', 'Battle Loot')."
+    },
+    "amount": {
+      "type": "number",
+      "description": "The quantity of the resource involved in the transaction."
+    },
+    "new_stockpile": {
+      "type": "number",
+      "description": "The nation's stockpile balance for this resource immediately after this transaction."
+    },
+    "related_entity_id": {
+      "type": "string",
+      "description": "Optional: ID of a related game entity (e.g., MarketListing ID, War ID, City ID)."
+    },
+    "turn_number": {
+      "type": "number",
+      "description": "The game turn this transaction occurred on."
+    }
+  },
+  "required": [
+    "nation_id",
+    "resource_type",
+    "transaction_type",
+    "category",
+    "amount",
+    "new_stockpile",
+    "turn_number"
+  ]
+}
