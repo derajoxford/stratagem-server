@@ -1,0 +1,28 @@
+{
+  "name": "MarketSnapshot",
+  "type": "object",
+  "properties": {
+    "total_market_value": {
+      "type": "number",
+      "description": "Total value of all active market listings at this point in time"
+    },
+    "total_listings": {
+      "type": "number",
+      "description": "Total number of active listings at this point in time"
+    },
+    "turn_number": {
+      "type": "number",
+      "description": "Game turn when this snapshot was taken"
+    },
+    "snapshot_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when this snapshot was recorded"
+    }
+  },
+  "required": [
+    "total_market_value",
+    "total_listings",
+    "turn_number"
+  ]
+}
