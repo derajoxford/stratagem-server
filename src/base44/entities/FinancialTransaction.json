@@ -1,0 +1,49 @@
+{
+  "name": "FinancialTransaction",
+  "type": "object",
+  "properties": {
+    "nation_id": {
+      "type": "string",
+      "description": "ID of the nation associated with this transaction."
+    },
+    "transaction_type": {
+      "type": "string",
+      "enum": [
+        "inflow",
+        "outflow"
+      ],
+      "description": "Indicates if it's money received or spent."
+    },
+    "category": {
+      "type": "string",
+      "description": "High-level categorization (e.g., 'Taxes', 'Trade', 'Military', 'Infrastructure', 'Alliance', 'Upkeep')."
+    },
+    "sub_category": {
+      "type": "string",
+      "description": "More specific detail (e.g., 'City Income', 'Unit Purchase: Tanks', 'Coal Sale', 'Alliance Aid Received')."
+    },
+    "amount": {
+      "type": "number",
+      "description": "The monetary amount of the transaction."
+    },
+    "new_balance": {
+      "type": "number",
+      "description": "The nation's treasury balance immediately after this transaction."
+    },
+    "related_entity_id": {
+      "type": "string",
+      "description": "Optional: ID of a related game entity (e.g., MarketListing ID, City ID, AllianceTransaction ID)."
+    },
+    "turn_number": {
+      "type": "number",
+      "description": "The game turn this transaction occurred on."
+    }
+  },
+  "required": [
+    "nation_id",
+    "transaction_type",
+    "category",
+    "amount",
+    "new_balance"
+  ]
+}
