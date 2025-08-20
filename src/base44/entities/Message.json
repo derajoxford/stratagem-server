@@ -1,0 +1,53 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "sender_nation_id": {
+      "type": "string",
+      "description": "ID of the nation sending the message. Null for system-generated notifications."
+    },
+    "recipient_nation_id": {
+      "type": "string",
+      "description": "ID of the nation receiving the message."
+    },
+    "subject": {
+      "type": "string",
+      "description": "The subject line of the message or notification."
+    },
+    "body": {
+      "type": "string",
+      "description": "The main content of the message."
+    },
+    "message_type": {
+      "type": "string",
+      "enum": [
+        "direct_message",
+        "battle_report",
+        "war_declaration",
+        "alliance_event",
+        "blockade_update",
+        "system_alert"
+      ],
+      "default": "direct_message",
+      "description": "The type of the message, used for filtering and display."
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if the recipient has read the message."
+    },
+    "related_entity_id": {
+      "type": "string",
+      "description": "An optional ID linking the message to a specific entity (e.g., a War ID for a battle report)."
+    },
+    "related_page": {
+      "type": "string",
+      "description": "An optional page name to link to when the notification is clicked (e.g., 'WarRoom')."
+    }
+  },
+  "required": [
+    "recipient_nation_id",
+    "subject",
+    "body"
+  ]
+}
