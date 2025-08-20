@@ -1,0 +1,57 @@
+{
+  "name": "BuyOrder",
+  "type": "object",
+  "properties": {
+    "buyer_nation_id": {
+      "type": "string",
+      "description": "Nation ID of the buyer"
+    },
+    "resource_type": {
+      "type": "string",
+      "enum": [
+        "oil",
+        "iron",
+        "steel",
+        "aluminum",
+        "coal",
+        "uranium",
+        "food",
+        "gold",
+        "bauxite",
+        "copper",
+        "diamonds",
+        "wood",
+        "ammo"
+      ],
+      "description": "Type of resource wanted"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Quantity wanted"
+    },
+    "max_price_per_unit": {
+      "type": "number",
+      "description": "Maximum price willing to pay per unit"
+    },
+    "total_budget": {
+      "type": "number",
+      "description": "Total budget allocated for this order"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "filled",
+        "cancelled"
+      ],
+      "default": "active",
+      "description": "Order status"
+    }
+  },
+  "required": [
+    "buyer_nation_id",
+    "resource_type",
+    "quantity",
+    "max_price_per_unit"
+  ]
+}
