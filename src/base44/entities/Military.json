@@ -1,0 +1,55 @@
+{
+  "name": "Military",
+  "type": "object",
+  "properties": {
+    "nation_id": {
+      "type": "string",
+      "description": "ID of the nation this military belongs to"
+    },
+    "soldiers": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of soldiers"
+    },
+    "tanks": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of tanks"
+    },
+    "aircraft": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of aircraft"
+    },
+    "warships": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of warships"
+    },
+    "conventional_bombs": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of conventional bombs"
+    },
+    "nuclear_weapons": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of nuclear weapons"
+    },
+    "military_investment": {
+      "type": "number",
+      "default": 0,
+      "description": "Total investment in military development"
+    },
+    "training_level": {
+      "type": "number",
+      "default": 1,
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Military training level (1-10)"
+    }
+  },
+  "required": [
+    "nation_id"
+  ]
+}
