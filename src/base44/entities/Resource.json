@@ -1,0 +1,83 @@
+{
+  "name": "Resource",
+  "type": "object",
+  "properties": {
+    "nation_id": {
+      "type": "string",
+      "description": "ID of the nation that owns these resources"
+    },
+    "oil": {
+      "type": "number",
+      "default": 0,
+      "description": "Oil reserves"
+    },
+    "gasoline": {
+      "type": "number",
+      "default": 0,
+      "description": "Processed gasoline for vehicles and equipment"
+    },
+    "iron": {
+      "type": "number",
+      "default": 0,
+      "description": "Iron ore reserves"
+    },
+    "steel": {
+      "type": "number",
+      "default": 0,
+      "description": "Steel reserves"
+    },
+    "aluminum": {
+      "type": "number",
+      "default": 0,
+      "description": "Aluminum reserves"
+    },
+    "coal": {
+      "type": "number",
+      "default": 0,
+      "description": "Coal reserves"
+    },
+    "uranium": {
+      "type": "number",
+      "default": 0,
+      "description": "Uranium reserves"
+    },
+    "food": {
+      "type": "number",
+      "default": 0,
+      "description": "Food production"
+    },
+    "gold": {
+      "type": "number",
+      "default": 0,
+      "description": "Gold reserves"
+    },
+    "bauxite": {
+      "type": "number",
+      "default": 0,
+      "description": "Bauxite reserves for aluminum production"
+    },
+    "copper": {
+      "type": "number",
+      "default": 0,
+      "description": "Copper reserves"
+    },
+    "diamonds": {
+      "type": "number",
+      "default": 0,
+      "description": "Diamond reserves"
+    },
+    "wood": {
+      "type": "number",
+      "default": 0,
+      "description": "Wood reserves"
+    },
+    "ammo": {
+      "type": "number",
+      "default": 0,
+      "description": "Ammunition reserves"
+    }
+  },
+  "required": [
+    "nation_id"
+  ]
+}
