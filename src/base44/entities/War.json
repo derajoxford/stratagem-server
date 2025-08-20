@@ -1,0 +1,127 @@
+{
+  "name": "War",
+  "type": "object",
+  "properties": {
+    "attacker_nation_id": {
+      "type": "string"
+    },
+    "defender_nation_id": {
+      "type": "string"
+    },
+    "attacker_alliance_id": {
+      "type": "string"
+    },
+    "defender_alliance_id": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "attacker_victory",
+        "defender_victory",
+        "peace_treaty",
+        "stalemate",
+        "ceasefire"
+      ]
+    },
+    "war_reason": {
+      "type": "string"
+    },
+    "war_name": {
+      "type": "string",
+      "description": "Custom name for the war"
+    },
+    "starting_resistance": {
+      "type": "number",
+      "default": 100,
+      "description": "The initial resistance value for both sides when war started"
+    },
+    "attacker_resistance_points": {
+      "type": "number",
+      "default": 100
+    },
+    "defender_resistance_points": {
+      "type": "number",
+      "default": 100
+    },
+    "attacker_tactical_points": {
+      "type": "number",
+      "default": 3,
+      "description": "Current tactical points available to the attacker"
+    },
+    "defender_tactical_points": {
+      "type": "number",
+      "default": 3,
+      "description": "Current tactical points available to the defender"
+    },
+    "total_battles": {
+      "type": "number",
+      "default": 0
+    },
+    "total_casualties_attacker": {
+      "type": "number",
+      "default": 0
+    },
+    "total_casualties_defender": {
+      "type": "number",
+      "default": 0
+    },
+    "blockade_details": {
+      "type": "object",
+      "properties": {
+        "is_active": {
+          "type": "boolean",
+          "default": false
+        },
+        "blockading_nation_id": {
+          "type": "string"
+        }
+      },
+      "default": {}
+    },
+    "war_conclusion_loot": {
+      "type": "object",
+      "properties": {
+        "cash_looted": {
+          "type": "number",
+          "default": 0
+        },
+        "resources_looted": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "default": {}
+        },
+        "alliance_cash_looted": {
+          "type": "number",
+          "default": 0
+        },
+        "cash_loot_percent_roll": {
+          "type": "number",
+          "default": 0
+        },
+        "resource_loot_percent_roll": {
+          "type": "number",
+          "default": 0
+        },
+        "alliance_loot_percent_roll": {
+          "type": "number",
+          "default": 0
+        }
+      },
+      "default": {},
+      "description": "Stores the details of spoils gained at the end of a war."
+    }
+  },
+  "required": []
+}
