@@ -1,0 +1,134 @@
+{
+  "name": "BattleLog",
+  "type": "object",
+  "properties": {
+    "war_id": {
+      "type": "string",
+      "description": "The ID of the war this log belongs to."
+    },
+    "battle_number": {
+      "type": "number",
+      "description": "Sequential number of the battle within the war."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "attack_type": {
+      "type": "string"
+    },
+    "attacker_nation_id": {
+      "type": "string"
+    },
+    "attacker_name": {
+      "type": "string"
+    },
+    "defender_nation_id": {
+      "type": "string",
+      "description": "The ID of the defending nation this battle log is for."
+    },
+    "defender_name": {
+      "type": "string"
+    },
+    "attacker_power": {
+      "type": "number"
+    },
+    "defender_power": {
+      "type": "number"
+    },
+    "power_ratio": {
+      "type": "number"
+    },
+    "base_roll": {
+      "type": "number"
+    },
+    "final_roll": {
+      "type": "number"
+    },
+    "outcome": {
+      "type": "string"
+    },
+    "outcome_multiplier": {
+      "type": "number"
+    },
+    "resistance_damage": {
+      "type": "number"
+    },
+    "attacker_losses": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Object detailing units lost by the attacker."
+    },
+    "defender_losses": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Object detailing units lost by the defender."
+    },
+    "loot_gained": {
+      "type": "number"
+    },
+    "infrastructure_value_destroyed": {
+      "type": "number",
+      "default": 0,
+      "description": "Monetary value of infrastructure destroyed in this battle"
+    },
+    "infrastructure_destroyed": {
+      "type": "object",
+      "properties": {
+        "slots_destroyed": {
+          "type": "number",
+          "default": 0
+        },
+        "buildings_destroyed": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "default": {}
+        }
+      },
+      "default": {},
+      "description": "Object detailing the quantity of infrastructure and buildings destroyed."
+    },
+    "civilian_casualties": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of civilians killed in this battle"
+    },
+    "ammo_consumed": {
+      "type": "number",
+      "description": "Amount of ammunition consumed by the attacker in this battle"
+    },
+    "gasoline_consumed": {
+      "type": "number",
+      "description": "Amount of gasoline consumed by the attacker in this battle"
+    },
+    "defender_ammo_consumed": {
+      "type": "number",
+      "default": 0,
+      "description": "Amount of ammunition consumed by the defender in this battle"
+    },
+    "defender_gasoline_consumed": {
+      "type": "number",
+      "default": 0,
+      "description": "Amount of gasoline consumed by the defender in this battle"
+    },
+    "units_committed": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Object detailing units committed by the attacker."
+    },
+    "selected_target": {
+      "type": "string",
+      "description": "The primary target selected for the attack (e.g., 'military_sites')."
+    }
+  },
+  "required": [
+    "war_id",
+    "battle_number",
+    "timestamp",
+    "attack_type",
+    "attacker_nation_id",
+    "defender_nation_id"
+  ]
+}
