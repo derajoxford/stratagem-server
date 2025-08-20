@@ -13,7 +13,7 @@ export async function runTick() {
     (globalThis as Any).Deno = Deno;
 
     // Load the raw file. It will likely call Deno.serve(handler) immediately.
-    const raw = require('../_base44_raw/gameTick');
+    const raw = require('../base44/functions/gameTick');
 
     // If it's an exported function, try calling it too (some files export a function as well).
     const fn = pickTickExport(raw);
