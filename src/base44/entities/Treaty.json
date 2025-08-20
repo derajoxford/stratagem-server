@@ -1,0 +1,83 @@
+{
+  "name": "Treaty",
+  "type": "object",
+  "properties": {
+    "treaty_name": {
+      "type": "string",
+      "description": "Name of the treaty"
+    },
+    "treaty_type": {
+      "type": "string",
+      "enum": [
+        "MDP",
+        "ODoAP",
+        "MDoAP",
+        "Protectorate",
+        "Extension",
+        "NAP"
+      ],
+      "description": "Type of treaty - MDP (Mutual Defense Pact), ODoAP (Optional Defense Optional Aggression Pact), MDoAP (Mutual Defense Optional Aggression Pact), Protectorate, Extension, NAP (Non-Aggression Pact)"
+    },
+    "alliance_1_id": {
+      "type": "string",
+      "description": "ID of the first alliance in the treaty"
+    },
+    "alliance_2_id": {
+      "type": "string",
+      "description": "ID of the second alliance in the treaty"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "active",
+        "cancelled",
+        "expired"
+      ],
+      "default": "proposed",
+      "description": "Current status of the treaty"
+    },
+    "proposed_by_alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance that proposed this treaty"
+    },
+    "terms": {
+      "type": "string",
+      "description": "Detailed terms and conditions of the treaty"
+    },
+    "duration_days": {
+      "type": "number",
+      "description": "Duration of the treaty in days (null for indefinite)"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the treaty expires (calculated from duration_days)"
+    },
+    "signed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the treaty was signed/became active"
+    },
+    "cancelled_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the treaty was cancelled"
+    },
+    "cancelled_by_alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance that cancelled the treaty"
+    },
+    "cancellation_reason": {
+      "type": "string",
+      "description": "Reason provided for treaty cancellation"
+    }
+  },
+  "required": [
+    "treaty_name",
+    "treaty_type",
+    "alliance_1_id",
+    "alliance_2_id",
+    "proposed_by_alliance_id"
+  ]
+}
