@@ -1,0 +1,27 @@
+{
+  "name": "GameConfig",
+  "type": "object",
+  "properties": {
+    "config_data_json": {
+      "type": "string",
+      "description": "Complete game configuration stored as a JSON string"
+    },
+    "config_version": {
+      "type": "string",
+      "default": "1.0",
+      "description": "Version of the configuration schema for migration purposes"
+    },
+    "last_updated_by": {
+      "type": "string",
+      "description": "Email of the admin who last updated the configuration"
+    },
+    "turns_per_game_day": {
+      "type": "number",
+      "default": 24,
+      "description": "Number of game turns that constitute one in-game day"
+    }
+  },
+  "required": [
+    "config_data_json"
+  ]
+}
