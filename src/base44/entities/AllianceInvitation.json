@@ -1,0 +1,48 @@
+{
+  "name": "AllianceInvitation",
+  "type": "object",
+  "properties": {
+    "alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance extending the invitation"
+    },
+    "invited_nation_id": {
+      "type": "string",
+      "description": "ID of the nation being invited"
+    },
+    "inviter_nation_id": {
+      "type": "string",
+      "description": "ID of the alliance member who sent the invitation"
+    },
+    "invitation_message": {
+      "type": "string",
+      "description": "Personal message accompanying the invitation"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined",
+        "expired"
+      ],
+      "default": "pending",
+      "description": "Current status of the invitation"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this invitation expires (7 days from creation)"
+    },
+    "responded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the nation responded to the invitation"
+    }
+  },
+  "required": [
+    "alliance_id",
+    "invited_nation_id",
+    "inviter_nation_id"
+  ]
+}
