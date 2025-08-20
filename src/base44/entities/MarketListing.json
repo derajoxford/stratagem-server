@@ -1,0 +1,57 @@
+{
+  "name": "MarketListing",
+  "type": "object",
+  "properties": {
+    "seller_nation_id": {
+      "type": "string",
+      "description": "Nation ID of the seller"
+    },
+    "resource_type": {
+      "type": "string",
+      "enum": [
+        "oil",
+        "iron",
+        "steel",
+        "aluminum",
+        "coal",
+        "uranium",
+        "food",
+        "gold",
+        "bauxite",
+        "copper",
+        "diamonds",
+        "wood",
+        "ammo"
+      ],
+      "description": "Type of resource being sold"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Quantity for sale"
+    },
+    "price_per_unit": {
+      "type": "number",
+      "description": "Price per unit in dollars"
+    },
+    "total_value": {
+      "type": "number",
+      "description": "Total value of the listing"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "sold",
+        "cancelled"
+      ],
+      "default": "active",
+      "description": "Listing status"
+    }
+  },
+  "required": [
+    "seller_nation_id",
+    "resource_type",
+    "quantity",
+    "price_per_unit"
+  ]
+}
