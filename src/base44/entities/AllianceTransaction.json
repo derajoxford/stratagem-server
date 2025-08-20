@@ -1,0 +1,101 @@
+{
+  "name": "AllianceTransaction",
+  "type": "object",
+  "properties": {
+    "alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance this transaction belongs to"
+    },
+    "transaction_type": {
+      "type": "string",
+      "enum": [
+        "deposit",
+        "withdrawal",
+        "transfer_out",
+        "transfer_in"
+      ],
+      "description": "Type of transaction"
+    },
+    "initiator_nation_id": {
+      "type": "string",
+      "description": "ID of the nation that initiated this transaction"
+    },
+    "recipient_nation_id": {
+      "type": "string",
+      "description": "For withdrawal transactions, the ID of the nation that received the funds/resources"
+    },
+    "amount": {
+      "type": "number",
+      "default": 0,
+      "description": "Amount of money involved in transaction"
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "oil": {
+          "type": "number",
+          "default": 0
+        },
+        "iron": {
+          "type": "number",
+          "default": 0
+        },
+        "steel": {
+          "type": "number",
+          "default": 0
+        },
+        "aluminum": {
+          "type": "number",
+          "default": 0
+        },
+        "coal": {
+          "type": "number",
+          "default": 0
+        },
+        "uranium": {
+          "type": "number",
+          "default": 0
+        },
+        "food": {
+          "type": "number",
+          "default": 0
+        },
+        "gold": {
+          "type": "number",
+          "default": 0
+        },
+        "bauxite": {
+          "type": "number",
+          "default": 0
+        },
+        "copper": {
+          "type": "number",
+          "default": 0
+        },
+        "diamonds": {
+          "type": "number",
+          "default": 0
+        },
+        "wood": {
+          "type": "number",
+          "default": 0
+        }
+      },
+      "default": {},
+      "description": "Resources involved in transaction"
+    },
+    "target_alliance_id": {
+      "type": "string",
+      "description": "For transfer transactions, the ID of the receiving alliance"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description or note about the transaction"
+    }
+  },
+  "required": [
+    "alliance_id",
+    "transaction_type",
+    "initiator_nation_id"
+  ]
+}
