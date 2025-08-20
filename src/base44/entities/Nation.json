@@ -1,0 +1,89 @@
+{
+  "name": "Nation",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the nation"
+    },
+    "leader_name": {
+      "type": "string",
+      "description": "Name of the nation's leader"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "The email of the user who owns this nation"
+    },
+    "alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance this nation belongs to"
+    },
+    "cities": {
+      "type": "number",
+      "default": 1,
+      "description": "Number of cities owned"
+    },
+    "population": {
+      "type": "number",
+      "default": 100000,
+      "description": "Total population"
+    },
+    "treasury": {
+      "type": "number",
+      "default": 1000000,
+      "description": "Nation's cash reserves"
+    },
+    "territory": {
+      "type": "number",
+      "default": 1000,
+      "description": "Land area in acres"
+    },
+    "government_type": {
+      "type": "string",
+      "enum": [
+        "democracy",
+        "republic",
+        "monarchy",
+        "dictatorship",
+        "federation"
+      ],
+      "default": "democracy",
+      "description": "Type of government"
+    },
+    "military_strength": {
+      "type": "number",
+      "default": 0,
+      "description": "Overall military power rating"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether nation is active"
+    },
+    "is_blockaded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indicates if the nation is under a naval blockade, preventing trade and alliance transfers."
+    },
+    "blockading_nation_id": {
+      "type": "string",
+      "description": "ID of the nation that is blockading this nation. Null if not blockaded."
+    },
+    "public_description": {
+      "type": "string",
+      "description": "Rich text public-facing description for the nation's profile page."
+    },
+    "profile_image_url": {
+      "type": "string",
+      "description": "URL to the nation's custom profile image."
+    },
+    "banner_image_url": {
+      "type": "string",
+      "description": "URL to the nation's custom banner image."
+    }
+  },
+  "required": [
+    "name",
+    "leader_name"
+  ]
+}
