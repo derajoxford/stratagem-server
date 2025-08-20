@@ -1,0 +1,59 @@
+{
+  "name": "EnvironmentalEvent",
+  "type": "object",
+  "properties": {
+    "turn_number": {
+      "type": "number",
+      "description": "The game turn this event occurred."
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "battle_bombardment",
+        "battle_nuclear_strike",
+        "city_pollution_source_activated",
+        "city_pollution_source_deactivated",
+        "global_cleanup_project",
+        "admin_override"
+      ],
+      "description": "Categorization of the event."
+    },
+    "source_nation_id": {
+      "type": "string",
+      "description": "Nation ID causing the event."
+    },
+    "target_nation_id": {
+      "type": "string",
+      "description": "Nation ID affected (e.g., defender in battle)."
+    },
+    "target_city_id": {
+      "type": "string",
+      "description": "Specific city ID affected."
+    },
+    "pollution_increase_local": {
+      "type": "number",
+      "description": "Amount of local pollution generated."
+    },
+    "fallout_increase_local": {
+      "type": "number",
+      "description": "Amount of local fallout generated."
+    },
+    "global_pollution_contribution": {
+      "type": "number",
+      "description": "Direct contribution to global pollution index."
+    },
+    "global_radiation_contribution": {
+      "type": "number",
+      "description": "Direct contribution to global radiation index."
+    },
+    "processed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Flag to indicate if this event has been processed by processEnvironmentalTurn."
+    }
+  },
+  "required": [
+    "turn_number",
+    "event_type"
+  ]
+}
