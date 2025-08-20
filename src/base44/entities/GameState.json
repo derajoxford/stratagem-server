@@ -1,0 +1,42 @@
+{
+  "name": "GameState",
+  "type": "object",
+  "properties": {
+    "current_turn_number": {
+      "type": "number",
+      "default": 1,
+      "description": "The current turn number of the game."
+    },
+    "last_turn_processed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp when the last turn was successfully processed."
+    },
+    "is_processing": {
+      "type": "boolean",
+      "default": false,
+      "description": "Flag to prevent concurrent turn processing."
+    },
+    "global_pollution_index": {
+      "type": "number",
+      "default": 0,
+      "description": "Accumulated world pollution."
+    },
+    "global_radiation_index": {
+      "type": "number",
+      "default": 0,
+      "description": "Accumulated world nuclear fallout."
+    },
+    "last_environmental_turn_number": {
+      "type": "number",
+      "default": 0,
+      "description": "The last turn number for which environmental processing was successfully completed."
+    },
+    "last_environmental_processed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp when environmental processing was last completed."
+    }
+  },
+  "required": []
+}
