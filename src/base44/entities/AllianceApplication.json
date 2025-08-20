@@ -1,0 +1,45 @@
+{
+  "name": "AllianceApplication",
+  "type": "object",
+  "properties": {
+    "alliance_id": {
+      "type": "string",
+      "description": "ID of the alliance being applied to"
+    },
+    "applicant_nation_id": {
+      "type": "string",
+      "description": "ID of the nation applying"
+    },
+    "application_message": {
+      "type": "string",
+      "description": "Message from the applicant explaining why they want to join"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Current status of the application"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Nation ID of the alliance member who reviewed this application"
+    },
+    "review_message": {
+      "type": "string",
+      "description": "Message from reviewer explaining approval/rejection"
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the application was reviewed"
+    }
+  },
+  "required": [
+    "alliance_id",
+    "applicant_nation_id"
+  ]
+}
